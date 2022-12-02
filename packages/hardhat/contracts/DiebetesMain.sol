@@ -11,6 +11,7 @@ contract DiebetesMain {
     error FUNDING_GOAL_ALREADY_REACHED();
     error FUNDING_GOAL_NOT_REACHED();
 
+    // Swap the domain ID
     uint32 public constant DOMAIN_ID = 9991;
 
     // The connext contract on the origin domain.
