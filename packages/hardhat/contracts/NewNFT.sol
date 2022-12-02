@@ -12,6 +12,8 @@ import {Base64} from "./Base64.sol";
 contract NFA is ERC721URIStorage, Ownable, ReentrancyGuard {
     uint32 public constant DOMAIN_ID = 1735353714; //swap domain id
 
+    string[3] public constant colors = ["#CD7F32", "#E5E4E2", "#FFD700"];
+
     IConnext public immutable connext;
 
     using Counters for Counters.Counter;
@@ -33,7 +35,9 @@ contract NFA is ERC721URIStorage, Ownable, ReentrancyGuard {
         address _contributor = abi.decode(_callData, (address));
         _tokenIds = _tokenIds + 1;
         _mint(msg.sender, _tokenIds);
+        // we will pass amount to `generateSVG`
         _setTokenURI(_id, generateSVG(_to, _id));
+        // _setTokenURI(_id, generateSVG(_to, _id, amount));
     }
 
     function withhdrawFunds(
@@ -65,28 +69,47 @@ contract NFA is ERC721URIStorage, Ownable, ReentrancyGuard {
         returns (string memory)
     {
         string memory strId = Strings.toString(_id);
-        string[5] memory value;
+        string[12] memory value;
 
         value[
             0
-        ] = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 400 400"> <rect width="100%" height="100%" fill="black" />';
-
-        value[1] = '<path d="';
-        value[2] = string(abi.encodePacked(string(extractedStr)));
-        value[3] = '" fill="#FFFFFF" stroke="#000000" stroke-width="1" />';
-        value[4] = string(abi.encodePacked(value[1], value[2], value[3]));
+        ] = '<svg width="250" height="150" style="border:1px solid red; background-color: gold">';
+        value[1] = '<text x="20" y="25" fill="purple"> Title :';
+        value[2] = "This is proposal";
+        value[3] = "</text>";
+        value[4] = '<text x="20" y="55" fill="purple"> Benefits : </text>';
+        value[6] = '<text x="20" y="75" fill="purple">1)';
+        value[7] = "60% off on medicines";
+        value[8] = "</text>";
+        value[9] = '<text x="20" y="95" fill="purple">2)';
+        value[10] = "Life time free home delivery";
+        value[11] = "</text>";
 
         string memory finalSvg = string(
-            abi.encodePacked(value[0], value[4], "</svg>")
+            abi.encodePacked(
+                value[0],
+                value[1],
+                value[2],
+                value[3],
+                value[4],
+                value[5],
+                value[6],
+                value[7],
+                value[8],
+                value[9],
+                value[10],
+                value[11],
+                "</svg>"
+            )
         );
 
         string memory json = Base64.encode(
             bytes(
                 string(
                     abi.encodePacked(
-                        '{ "name": "NFA #',
+                        '{ "name": "NFC #',
                         strId,
-                        '", "description": "NFA is an on-chain generative art, that gives identity to your address as an NFT, each NFT resonates with Ethereum logo.", "image": "data:image/svg+xml;base64,',
+                        '", "description": "NFC is a initicative for wellness and goodness towords the new world.", "image": "data:image/svg+xml;base64,',
                         Base64.encode(bytes(finalSvg)),
                         '"}'
                     )
@@ -99,12 +122,5 @@ contract NFA is ERC721URIStorage, Ownable, ReentrancyGuard {
         );
 
         return finalTokenUri;
-    }
-
-    function withdraw() public payable onlyOwner {
-        (bool success, ) = payable(msg.sender).call{
-            value: address(this).balance
-        }("");
-        require(success, "Failed");
     }
 }
