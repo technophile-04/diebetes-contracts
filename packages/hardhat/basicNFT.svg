@@ -1,0 +1,6 @@
+    <svg width="250" height="150" style="border:1px solid red; background-color: gold">
+      <text x="20" y="25" fill="purple">Title : This is proposal</text>
+      <text x="20" y="55" fill="purple">Benefits : </text>
+      <text x="20" y="75" fill="purple">1) 60% off on medicines </text>
+      <text x="20" y="95" fill="purple">2) 80% off on medicines </text>
+    </svg>
