@@ -266,7 +266,7 @@ module.exports = {
         },
       },
       {
-        version: "0.6.7",
+        version: "0.8.17",
         settings: {
           optimizer: {
             enabled: true,
@@ -277,7 +277,7 @@ module.exports = {
     ],
   },
   ovm: {
-    solcVersion: "0.7.6",
+    solcVersion: "0.8.17",
   },
   namedAccounts: {
     deployer: {
