@@ -13,16 +13,26 @@ const localChainId = "31337";
 //   );
 
 module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
+  const chainId = await getChainId();
+  if (chainId !== "80001") {
+    console.log(
+      "Reverting from deploy of DiebetesMain contract since its not on mumbai",
+      chainId
+    );
+    return;
+  }
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
-  const chainId = await getChainId();
 
   await deploy("DiebetesMain", {
     // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
     from: deployer,
-    // args: [ "Hello", ethers.utils.parseEther("1.5") ],
+    args: [
+      "0xa2F2ed226d4569C8eC09c175DDEeF4d41Bab4627",
+      "0xeDb95D8037f769B72AAab41deeC92903A98C9E16",
+    ],
     log: true,
-    waitConfirmations: 5,
+    waitConfirmations: 4,
   });
 
   // Getting a previously deployed contract
@@ -67,16 +77,19 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
 
   // You can also Verify your contracts with Etherscan here...
   // You don't want to verify on localhost
-  // try {
-  //   if (chainId !== localChainId) {
-  //     await run("verify:verify", {
-  //       address: YourContract.address,
-  //       contract: "contracts/YourContract.sol:YourContract",
-  //       constructorArguments: [],
-  //     });
-  //   }
-  // } catch (error) {
-  //   console.error(error);
-  // }
+  try {
+    if (chainId !== localChainId) {
+      await run("verify:verify", {
+        address: DiebetesMain.address,
+        contract: "contracts/DiebetesMain.sol:DiebetesMain",
+        constructorArguments: [
+          "0xa2F2ed226d4569C8eC09c175DDEeF4d41Bab4627",
+          "0xeDb95D8037f769B72AAab41deeC92903A98C9E16",
+        ],
+      });
+    }
+  } catch (error) {
+    console.error(error);
+  }
 };
 module.exports.tags = ["DiebetesMain"];
