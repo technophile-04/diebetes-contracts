@@ -23,6 +23,53 @@ contract NFC is ERC721Enumerable {
         connext = _connext;
     }
 
+    /**
+     * @dev See {IERC721-transferFrom}.
+     */
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public override(ERC721, IERC721) {
+        // avoid compiler warnings
+        from;
+        to;
+        tokenId;
+        revert("transfer not allowed");
+    }
+
+    /**
+     * @dev See {IERC721-safeTransferFrom}.
+     */
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public override(ERC721, IERC721) {
+        // avoid compiler warnings
+        from;
+        to;
+        tokenId;
+        revert("transfer not allowed");
+    }
+
+    /**
+     * @dev See {IERC721-safeTransferFrom}.
+     */
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId,
+        bytes memory data
+    ) public override(ERC721, IERC721) {
+        // avoid compiler warnings
+        from;
+        to;
+        tokenId;
+        data;
+        revert("transfer not allowed");
+    }
+
     function xReceive(
         bytes32 _transferId,
         uint256 _amount,
