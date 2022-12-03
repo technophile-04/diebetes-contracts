@@ -14,39 +14,36 @@ const localChainId = "31337";
 
 module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   const chainId = await getChainId();
-  if (chainId !== "80001") {
+  if (chainId !== "5") {
     console.log(
-      "Reverting from deploy of DiebetesMain contract since its not on mumbai",
-      chainId
+      "Reverting from deploy of NFC contract since its not on goerli"
     );
     return;
   }
+
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  await deploy("DiebetesMain", {
+  await deploy("NFC", {
     // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
     from: deployer,
-    args: [
-      "0xa2F2ed226d4569C8eC09c175DDEeF4d41Bab4627",
-      "0xeDb95D8037f769B72AAab41deeC92903A98C9E16",
-    ],
+    args: ["0xb35937ce4fFB5f72E90eAD83c10D33097a4F18D2"],
     log: true,
-    waitConfirmations: 4,
+    waitConfirmations: 2,
   });
 
   // Getting a previously deployed contract
-  const DiebetesMain = await ethers.getContract("DiebetesMain", deployer);
-  /*  await YourContract.setPurpose("Hello");
+  const NFC = await ethers.getContract("NFC", deployer);
+  /*  await NFC.setPurpose("Hello");
   
     // To take ownership of yourContract using the ownable library uncomment next line and add the 
     // address you want to be the owner. 
     
-    await YourContract.transferOwnership(
+    await NFC.transferOwnership(
       "ADDRESS_HERE"
     );
 
-    //const YourContract = await ethers.getContractAt('YourContract', "0xaAC799eC2d00C013f1F11c37E654e59B0429DF6A") //<-- if you want to instantiate a version of a contract at a specific address!
+    //const NFC = await ethers.getContractAt('NFC', "0xaAC799eC2d00C013f1F11c37E654e59B0429DF6A") //<-- if you want to instantiate a version of a contract at a specific address!
   */
 
   /*
@@ -60,7 +57,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
 
   /*
   //If you want to send some ETH to a contract on deploy (make your constructor payable!)
-  const yourContract = await deploy("YourContract", [], {
+  const yourContract = await deploy("NFC", [], {
   value: ethers.utils.parseEther("0.05")
   });
   */
@@ -68,7 +65,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   /*
   //If you want to link a library into your contract:
   // reference: https://github.com/austintgriffith/scaffold-eth/blob/using-libraries-example/packages/hardhat/scripts/deploy.js#L19
-  const yourContract = await deploy("YourContract", [], {}, {
+  const yourContract = await deploy("NFC", [], {}, {
    LibraryName: **LibraryAddress**
   });
   */
@@ -80,16 +77,13 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   try {
     if (chainId !== localChainId) {
       await run("verify:verify", {
-        address: DiebetesMain.address,
-        contract: "contracts/DiebetesMain.sol:DiebetesMain",
-        constructorArguments: [
-          "0xa2F2ed226d4569C8eC09c175DDEeF4d41Bab4627",
-          "0xeDb95D8037f769B72AAab41deeC92903A98C9E16",
-        ],
+        address: NFC.address,
+        contract: "contracts/NFC.sol:NFC",
+        constructorArguments: ["0xb35937ce4fFB5f72E90eAD83c10D33097a4F18D2"],
       });
     }
   } catch (error) {
     console.error(error);
   }
 };
-module.exports.tags = ["DiebetesMain"];
+module.exports.tags = ["NFC"];

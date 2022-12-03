@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Button, Col, Menu, Row } from "antd";
 
 import "antd/dist/antd.css";
@@ -54,7 +55,7 @@ const { ethers } = require("ethers");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const initialNetwork = NETWORKS.localhost; // <------- select your target frontend network (localhost, goerli, xdai, mainnet)
+const initialNetwork = NETWORKS.mumbai; // <------- select your target frontend network (localhost, goerli, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
 const DEBUG = true;
@@ -224,6 +225,7 @@ function App(props) {
     myMainnetDAIBalance,
   ]);
 
+  // eslint--ingre
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
     setInjectedProvider(new ethers.providers.Web3Provider(provider));
@@ -330,7 +332,7 @@ function App(props) {
             */}
 
           <Contract
-            name="YourContract"
+            name="DiebeticFunding"
             price={price}
             signer={userSigner}
             provider={localProvider}
