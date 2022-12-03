@@ -36,9 +36,9 @@ contract NFC is ERC721Enumerable {
         _originSender;
         _origin;
         // Unpack the _callData
-        (address _contributor, uint256 _contributedAmount) = abi.decode(
+        (address _contributor, uint128 _contributedAmount) = abi.decode(
             _callData,
-            (address, uint256)
+            (address, uint128)
         );
         _tokenIds.increment();
  
