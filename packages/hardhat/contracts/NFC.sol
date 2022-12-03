@@ -3,12 +3,11 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {IConnext} from "@connext/nxtp-contracts/contracts/core/connext/interfaces/IConnext.sol";
 import {Base64} from "./Base64.sol";
 
-contract NFC is ERC721Enumerable, ReentrancyGuard {
-    uint32 public constant DOMAIN_ID = 9991; //swap domain id
+contract NFC is ERC721Enumerable {
+    uint32 public constant DOMAIN_ID = 9991;
 
     string[3] public colors = ["#CD7F32", "#E5E4E2", "#FFD700"];
     mapping(uint256 => string) idToColor;
@@ -30,13 +29,19 @@ contract NFC is ERC721Enumerable, ReentrancyGuard {
         uint32 _origin,
         bytes memory _callData
     ) external returns (bytes memory) {
+        // avoiding compiler warnings
+        _transferId;
+        _amount;
+        _asset;
+        _originSender;
+        _origin;
         // Unpack the _callData
         (address _contributor, uint256 _contributedAmount) = abi.decode(
             _callData,
             (address, uint256)
         );
         _tokenIds.increment();
-
+ 
         {
             uint256 _id = _tokenIds.current();
             if (_contributedAmount <= 0.05 ether) {
@@ -88,7 +93,9 @@ contract NFC is ERC721Enumerable, ReentrancyGuard {
 
         string memory finalSvg = string(
             abi.encodePacked(
-                '<svg width="250" height="150" style="border:1px solid red; background-color: gold">',
+                '<svg width="250" height="150" style="border:1px solid red; background-color: "',
+                certificateBG,
+                '">',
                 '<text x="20" y="25" fill="purple"> Title :',
                 "This is proposal",
                 "</text>",
