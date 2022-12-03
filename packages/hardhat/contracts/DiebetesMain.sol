@@ -12,7 +12,7 @@ contract DiebetesMain {
     error FUNDING_GOAL_NOT_REACHED();
 
     // Swap the domain ID
-    uint32 public constant DOMAIN_ID = 9991;
+    uint32 public constant DOMAIN_ID = 1735353714; 
 
     // The connext contract on the origin domain.
     IConnext public immutable connext;
@@ -71,7 +71,7 @@ contract DiebetesMain {
 
         // Include the relayerFee so Pong will use the same fee
         // Include the address of this contract so Pong will know where to send the "callback"
-        bytes memory _callData = abi.encode(msg.sender);
+        bytes memory _callData = abi.encode(msg.sender, _amount);
         connext.xcall{value: 0}(
             DOMAIN_ID, // _destination: Domain ID of the destination chain
             _target, // _to: address of the target contract (Pong)

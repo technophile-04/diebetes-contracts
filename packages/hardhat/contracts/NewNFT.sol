@@ -9,10 +9,10 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {IConnext} from "@connext/nxtp-contracts/contracts/core/connext/interfaces/IConnext.sol";
 import {Base64} from "./Base64.sol";
 
-contract NFA is ERC721URIStorage, Ownable, ReentrancyGuard {
-    uint32 public constant DOMAIN_ID = 1735353714; //swap domain id
+contract NFC is ERC721URIStorage, Ownable, ReentrancyGuard {
+    uint32 public constant DOMAIN_ID = 9991; //swap domain id
 
-    string[3] public constant colors = ["#CD7F32", "#E5E4E2", "#FFD700"];
+    string[3] public colors = ["#CD7F32", "#E5E4E2", "#FFD700"];
 
     IConnext public immutable connext;
 
@@ -32,12 +32,14 @@ contract NFA is ERC721URIStorage, Ownable, ReentrancyGuard {
         bytes memory _callData
     ) external returns (bytes memory) {
         // Unpack the _callData
-        address _contributor = abi.decode(_callData, (address));
-        _tokenIds = _tokenIds + 1;
-        _mint(msg.sender, _tokenIds);
+        (address _contributor, uint256 _contributedAmount) = abi.decode(_callData, (address,uint256));
+        _tokenIds.increment();
+        {
+        uint256 _id = _tokenIds.current();
+        _mint(_contributor, _id);
         // we will pass amount to `generateSVG`
-        _setTokenURI(_id, generateSVG(_to, _id));
-        // _setTokenURI(_id, generateSVG(_to, _id, amount));
+        _setTokenURI(_id, generateSVG(_contributedAmount));
+        }
     }
 
     function withhdrawFunds(
@@ -63,12 +65,12 @@ contract NFA is ERC721URIStorage, Ownable, ReentrancyGuard {
         return _tokenIds.current();
     }
 
-    function generateSVG(string memory _to, uint256 _id)
+    function generateSVG(uint256 _amount)
         private
-        view
+        pure
         returns (string memory)
     {
-        string memory strId = Strings.toString(_id);
+        string memory strId = Strings.toString(_amount);
         string[12] memory value;
 
         value[
@@ -84,43 +86,44 @@ contract NFA is ERC721URIStorage, Ownable, ReentrancyGuard {
         value[9] = '<text x="20" y="95" fill="purple">2)';
         value[10] = "Life time free home delivery";
         value[11] = "</text>";
+        
+        // string memory finalSvg = string(
+        //     abi.encodePacked(
+        //         value[0],
+        //         value[1],
+        //         value[2],
+        //         value[3],
+        //         value[4],
+        //         value[5],
+        //         value[6],
+        //         value[7],
+        //         value[8],
+        //         value[9],
+        //         value[10],
+        //         value[11],
+        //         "</svg>"
+        //     )
+        // );
 
-        string memory finalSvg = string(
-            abi.encodePacked(
-                value[0],
-                value[1],
-                value[2],
-                value[3],
-                value[4],
-                value[5],
-                value[6],
-                value[7],
-                value[8],
-                value[9],
-                value[10],
-                value[11],
-                "</svg>"
-            )
-        );
+        // string memory json = Base64.encode(
+        //     bytes(
+        //         string(
+        //             abi.encodePacked(
+        //                 '{ "name": "NFC #',
+        //                 strId,
+        //                 '", "description": "NFC is a initicative for wellness and goodness towords the new world.", "image": "data:image/svg+xml;base64,',
+        //                 Base64.encode(bytes(finalSvg)),
+        //                 '"}'
+        //             )
+        //         )
+        //     )
+        // );
 
-        string memory json = Base64.encode(
-            bytes(
-                string(
-                    abi.encodePacked(
-                        '{ "name": "NFC #',
-                        strId,
-                        '", "description": "NFC is a initicative for wellness and goodness towords the new world.", "image": "data:image/svg+xml;base64,',
-                        Base64.encode(bytes(finalSvg)),
-                        '"}'
-                    )
-                )
-            )
-        );
+        // // string memory finalTokenUri = 
 
-        string memory finalTokenUri = string(
-            abi.encodePacked("data:application/json;base64,", json)
-        );
-
-        return finalTokenUri;
+        // return string(
+        //     abi.encodePacked("data:application/json;base64,", json)
+        // );
+        
     }
 }
