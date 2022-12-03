@@ -12,10 +12,11 @@ contract DiebeticFunding {
     error FUNDING_GOAL_ALREADY_REACHED();
     error FUNDING_GOAL_NOT_REACHED();
 
-    event ProposalCreated(uint256 proposalId, address proposer, uint128 fundingTarget);
+    event ProposalCreated(uint256 proposalId, address proposer, uint128 fundingTarget, string researchPaperCID);
     event Pay(address contributor, uint256 proposalId, uint128 amount);
     event WithdrawFunding(uint256 proposalId, uint128 fundingAmount);
     event WithdrawContribution(address contributor, uint256 proposalId, uint256 withdrawnAmount);
+    event ResearchFindingAdded(uint256 proposalId, string researchFindingCID);
 
     // Swap the domain ID
     uint32 public constant DOMAIN_ID = 1735353714; 
@@ -29,7 +30,8 @@ contract DiebeticFunding {
 
     struct FundingInfo {
         address proposalOwner;
-        string ipfsURl;
+        string researchPaperCID;
+        string researchFindingCID;
         uint128 fundingTarget;
         uint128 fundingReceived;
     }
@@ -45,17 +47,18 @@ contract DiebeticFunding {
 
     function createFundingProposal(
         uint128 _fundingTarget,
-        string memory ipfsURl
+        string memory _researchPaperCID
     ) external {
         numProposals += 1;
-        if (bytes(ipfsURl).length == 0 || _fundingTarget == 0) revert INVALID_PROPOSAL();
+        if (bytes(_researchPaperCID).length == 0 || _fundingTarget == 0) revert INVALID_PROPOSAL();
         fundingInfoOf[numProposals] = FundingInfo({
             proposalOwner: msg.sender,
-            ipfsURl: ipfsURl,
+            researchPaperCID: _researchPaperCID,
+            researchFindingCID: "",
             fundingTarget: _fundingTarget,
             fundingReceived: 0
         });
-        emit ProposalCreated(numProposals, msg.sender, _fundingTarget);
+        emit ProposalCreated(numProposals, msg.sender, _fundingTarget, _researchPaperCID);
     }
 
     function pay(
@@ -136,5 +139,12 @@ contract DiebeticFunding {
         contributionOf[_contributor][_fundingInfo.proposalOwner] = 0;
         token.transfer(_contributor, _amountToTransfer);
         emit WithdrawContribution(_contributor, _proposalId, _amountToTransfer);
+    }
+
+    function addResearchFindings(uint256 _proposalId, string memory _researchFindingCID) external {
+        FundingInfo storage _fundingInfo = fundingInfoOf[_proposalId];
+        if (_fundingInfo.fundingTarget == 0) revert PROPOSAL_NOT_CREATED();
+        _fundingInfo.researchFindingCID = _researchFindingCID;
+        emit ResearchFindingAdded(_proposalId, _researchFindingCID);
     }
 }
