@@ -41,7 +41,7 @@ contract NFC is ERC721Enumerable {
             (address, uint128)
         );
         _tokenIds.increment();
- 
+
         {
             uint256 _id = _tokenIds.current();
             if (_contributedAmount <= 0.05 ether) {
@@ -93,7 +93,7 @@ contract NFC is ERC721Enumerable {
 
         string memory finalSvg = string(
             abi.encodePacked(
-                '<svg width="250" height="150" style="border:1px solid red; background-color: "',
+                '<svg width="250" height="150" style="border:1px solid red; background-color:',
                 certificateBG,
                 '">',
                 '<text x="20" y="25" fill="purple"> Title :',
