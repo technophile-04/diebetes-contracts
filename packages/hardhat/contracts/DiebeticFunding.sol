@@ -38,7 +38,7 @@ contract DiebeticFunding {
 
     mapping(uint256 => FundingInfo) public fundingInfoOf;
 
-    mapping(address => mapping(address => uint256)) public contributionOf;
+    mapping(address => mapping(uint256 => uint128)) public contributionOf;
 
     constructor(IConnext _connext, IERC20 _token) {
         connext = _connext;
@@ -75,14 +75,14 @@ contract DiebeticFunding {
 
         _fundingInfo.fundingReceived += _amount;
 
-        contributionOf[msg.sender][_fundingInfo.proposalOwner] += _amount;
+        contributionOf[msg.sender][_proposalId] += _amount;
 
         // User sends funds to this contract
         token.transferFrom(msg.sender, address(this), _amount);
 
         // Include the relayerFee so Pong will use the same fee
         // Include the address of this contract so Pong will know where to send the "callback"
-        bytes memory _callData = abi.encode(msg.sender, _amount);
+        bytes memory _callData = abi.encode(msg.sender, _amount, _proposalId);
         connext.xcall{value: 0}(
             DOMAIN_ID, // _destination: Domain ID of the destination chain
             _target, // _to: address of the target contract (Pong)
@@ -133,10 +133,11 @@ contract DiebeticFunding {
         );
         FundingInfo storage _fundingInfo = fundingInfoOf[_proposalId];
         if (_fundingInfo.fundingReceived == 0) revert FUNDS_NOT_AVAILABLE();
-        uint256 _amountToTransfer = contributionOf[_contributor][
-            _fundingInfo.proposalOwner
+        uint128 _amountToTransfer = contributionOf[_contributor][
+            _proposalId
         ];
-        contributionOf[_contributor][_fundingInfo.proposalOwner] = 0;
+        _fundingInfo.fundingReceived -= _amountToTransfer;
+        contributionOf[_contributor][_proposalId] = 0;
         token.transfer(_contributor, _amountToTransfer);
         emit WithdrawContribution(_contributor, _proposalId, _amountToTransfer);
     }

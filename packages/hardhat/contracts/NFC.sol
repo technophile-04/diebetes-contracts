@@ -7,6 +7,8 @@ import {IConnext} from "@connext/nxtp-contracts/contracts/core/connext/interface
 import {Base64} from "./Base64.sol";
 
 contract NFC is ERC721Enumerable {
+    event CertificateGenerated(uint256 tokenId, uint256 proposalId, address contributor);
+
     uint32 public constant DOMAIN_ID = 9991;
 
     string[3] public colors = ["#CD7F32", "#E5E4E2", "#FFD700"];
@@ -36,9 +38,9 @@ contract NFC is ERC721Enumerable {
         _originSender;
         _origin;
         // Unpack the _callData
-        (address _contributor, uint128 _contributedAmount) = abi.decode(
+        (address _contributor, uint128 _contributedAmount, uint256 _proposalId) = abi.decode(
             _callData,
-            (address, uint128)
+            (address, uint128, uint256)
         );
         _tokenIds.increment();
 
@@ -53,6 +55,7 @@ contract NFC is ERC721Enumerable {
             }
 
             _mint(_contributor, _id);
+            emit CertificateGenerated(_id, _proposalId, _contributor);
         }
     }
 
