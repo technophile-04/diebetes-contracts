@@ -93,7 +93,7 @@ contract NFC is ERC721Enumerable {
 
         string memory finalSvg = string(
             abi.encodePacked(
-                '<svg width="250" height="150" style="border:1px solid red; background-color:',
+                '<svg xmlns="http://www.w3.org/2000/svg" width="250" height="150" style="border:1px solid red; background-color:',
                 certificateBG,
                 '">',
                 '<text x="20" y="25" fill="purple"> Title :',
