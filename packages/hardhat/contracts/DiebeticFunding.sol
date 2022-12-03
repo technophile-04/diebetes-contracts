@@ -3,13 +3,19 @@ pragma solidity 0.8.17;
 import {IConnext} from "@connext/nxtp-contracts/contracts/core/connext/interfaces/IConnext.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract DiebetesMain {
+contract DiebeticFunding {
     error INVALID_CONTRIBUTOR();
+    error INVALID_PROPOSAL();
     error INVALID_PROPOSAL_OWNER();
     error PROPOSAL_NOT_CREATED();
     error FUNDS_NOT_AVAILABLE();
     error FUNDING_GOAL_ALREADY_REACHED();
     error FUNDING_GOAL_NOT_REACHED();
+
+    event ProposalCreated(uint256 proposalId, address proposer, uint128 fundingTarget);
+    event Pay(address contributor, uint256 proposalId, uint128 amount);
+    event WithdrawFunding(uint256 proposalId, uint128 fundingAmount);
+    event WithdrawContribution(address contributor, uint256 proposalId, uint256 withdrawnAmount);
 
     // Swap the domain ID
     uint32 public constant DOMAIN_ID = 1735353714; 
@@ -42,12 +48,14 @@ contract DiebetesMain {
         string memory ipfsURl
     ) external {
         numProposals += 1;
+        if (bytes(ipfsURl).length == 0 || _fundingTarget == 0) revert INVALID_PROPOSAL();
         fundingInfoOf[numProposals] = FundingInfo({
             proposalOwner: msg.sender,
             ipfsURl: ipfsURl,
             fundingTarget: _fundingTarget,
             fundingReceived: 0
         });
+        emit ProposalCreated(numProposals, msg.sender, _fundingTarget);
     }
 
     function pay(
@@ -81,6 +89,7 @@ contract DiebetesMain {
             0, // _slippage: the maximum amount of slippage the user will accept in BPS, in this case 0.3%
             _callData // _callData: the encoded calldata to send
         );
+        emit Pay(msg.sender, _proposalId, _amount);
     }
 
     function withdrawFundingAmount(uint256 _proposalId) external {
@@ -97,6 +106,7 @@ contract DiebetesMain {
         _fundingInfo.fundingReceived = 0;
 
         token.transfer(msg.sender, _fundingInfo.fundingTarget);
+        emit WithdrawFunding(_proposalId, _fundingInfo.fundingTarget);
     }
 
     function xReceive(
@@ -107,6 +117,12 @@ contract DiebetesMain {
         uint32 _origin,
         bytes memory _callData
     ) external returns (bytes memory) {
+        // avoiding compiler warnings
+        _transferId;
+        _amount;
+        _asset;
+        _originSender;
+        _origin;
         // Unpack the _callData
         (address _contributor, uint256 _proposalId) = abi.decode(
             _callData,
@@ -119,5 +135,6 @@ contract DiebetesMain {
         ];
         contributionOf[_contributor][_fundingInfo.proposalOwner] = 0;
         token.transfer(_contributor, _amountToTransfer);
+        emit WithdrawContribution(_contributor, _proposalId, _amountToTransfer);
     }
 }
